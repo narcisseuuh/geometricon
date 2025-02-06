@@ -1,0 +1,9 @@
+(library
+ (name frontend)
+ (public_name geometricon.frontend)
+ (synopsis "parsing, lexing and ast definition for the geometric language."))
+
+(menhir
+ (modules parser))
+  
+(ocamllex lexer)

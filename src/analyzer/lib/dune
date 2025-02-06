@@ -1,0 +1,5 @@
+(library
+ (name analyzer)
+ (public_name geometricon.analyzer)
+ (libraries geometricon.frontend)
+ (synopsis "an abstract analyzer for the geometric language."))

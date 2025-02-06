@@ -1,0 +1,22 @@
+(lang dune 3.17)
+(name geometricon)
+(using menhir 3.0)
+
+(generate_opam_files)
+
+(license "MIT")
+
+(source (github narcisseuuh/geometricon))
+(homepage "https://github.com/narcisseuuh/geometricon")
+
+(authors "Augustin Perrin")
+
+(package
+  (name geometricon)
+  (synopsis "An abstract interpreter/interpreter for a geometric language.")
+  (description "An abstract interpreter/interpreter for a geometric language.")
+  (depends
+    (ocaml (>= 4.08.0))
+    ocamlformat
+  )
+)

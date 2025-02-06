@@ -1,0 +1,5 @@
+(library
+ (name interpreter)
+ (public_name geometricon.interpreter)
+ (libraries geometricon.frontend)
+ (synopsis "a library to construct the interpreter for the geometric language."))
