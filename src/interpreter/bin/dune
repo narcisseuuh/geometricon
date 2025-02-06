@@ -1,5 +1,5 @@
 (executable
  (name interpreter)
  (public_name interpreter)
- (libraries geometricon.frontend)
+ (libraries geometricon.frontend geometricon.interpreter)
  (package geometricon))

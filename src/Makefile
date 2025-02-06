@@ -20,10 +20,6 @@ test:
 install:
 	dune install
 
-.PHONY: uninstall
-uninstall:
-	dune uninstall
-
 .PHONY: clean
 clean:
 	dune clean
