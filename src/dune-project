@@ -10,11 +10,12 @@
 (homepage "https://github.com/narcisseuuh/geometricon")
 
 (authors "Augustin Perrin")
+(maintainers "Augustin Perrin")
 
 (package
   (name geometricon)
-  (synopsis "An abstract interpreter/interpreter for a geometric language.")
-  (description "An abstract interpreter/interpreter for a geometric language.")
+  (synopsis "An abstract interpreter/interpreter for a geometric language")
+  (description "An abstract interpreter/interpreter for a geometric language")
   (depends
     (ocaml (>= 4.08.0))
     ocamlformat

@@ -18,4 +18,34 @@ You will then have installed the binaries `interpreter` and `analyzer` which pro
 
 ## Documentation
 
-A documentation has been written in `doc/` to clarify the choices I made and the techniques I tried to implement.
+### Parsed BNF Grammar
+
+The parsed BNF grammar of the language is as follows:
+```bnf
+program ::=
+    init ';' stmt_list EOF
+    ;
+
+init ::=
+    'init' '(' set '×' set ')'
+    ;
+
+set ::=
+    '[' INT ',' INT ']'
+    ;
+
+stmt_list ::=
+    stmt (';' stmt)*
+    ;
+
+stmt ::=
+    operation
+    | '{' stmt_list '}' 'or' '{' stmt_list '}'
+    | 'iter' '{' stmt_list '}'
+    ;
+
+operation ::=
+    'translation' '(' INT ',' INT ')'
+    | 'rotation' '(' INT ',' INT ',' INT ')'
+    ;
+```

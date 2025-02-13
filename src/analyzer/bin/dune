@@ -1,5 +1,5 @@
 (executable
  (name analyzer)
  (public_name analyzer)
- (libraries geometricon.frontend)
+ (libraries geometricon.frontend geometricon.analyzer)
  (package geometricon))

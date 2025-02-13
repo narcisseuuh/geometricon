@@ -1,0 +1,5 @@
+(executable
+ (name run_tests)
+ (public_name geometricon.test)
+ (libraries geometricon.frontend geometricon.analyzer)
+ (package geometricon))

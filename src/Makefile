@@ -14,7 +14,7 @@ build:
 .PHONY: test
 test:
 	dune build tests/run_tests.exe
-	./test
+	_build/default/tests/run_tests.exe
 
 .PHONY: install
 install:
