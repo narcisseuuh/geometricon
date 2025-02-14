@@ -1,6 +1,8 @@
 include Frontend.Lex_and_parse
 include Analyzer.Analysis
-include Analyzer.Results
+include Analyzer.Interval_domain
+
+module AbsInterpreter = Interprete(Interval)
 
 exception ArgsError of string
 
@@ -70,5 +72,5 @@ let () =
     else
       let ast = get_ast !file in
       let () = print Format.std_formatter ast in
-      ()
+      AbsInterpreter.eval_prog ast 
   end

@@ -1,28 +1,29 @@
 include Frontend.Ast
 include Frontend.Lex_and_parse
 include Analyzer.Analysis
+include Analyzer.Interval_domain
+
+module AbsInterpreter = Interprete(Interval)
 
 (* precising arguments the following way :
 ([filename], [loop_unroll || -1], [widening || -1]) *)
 let parameters = [
-  ("basic1.geo", -1, -1);
-  ("basic2.geo", -1, -1);
-  ("basic3.geo", -1, -1);
-  ("basic4.geo", -1, -1);
-  ("basic5.geo", -1, -1);
-  ("widening.geo", 5, 5);
+  ("tests/basic1.geo", -1);
+  ("tests/basic2.geo", -1);
+  ("tests/basic3.geo", -1);
+  ("tests/basic4.geo", -1);
+  ("tests/basic5.geo", -1);
+  ("tests/widening.geo", 5);
 ]
 
 let rec analyze_tests p =
   match p with
-  | (filename, unroll, widening) :: rest ->
+  | (filename, unroll) :: rest ->
     begin
-      let _ast = get_ast filename in
+      let ast = get_ast filename in
       if unroll > 0 then
         loop_unroll := unroll;
-      if widening > 0 then
-        widening_delay := widening;
-      ();
+      AbsInterpreter.eval_prog ast;
       analyze_tests rest
     end
   | [] -> ()

@@ -34,10 +34,62 @@ let (<+>) x y =
   | N_INF -> N_INF
   | F xx -> F (xx +. y)
 
+let rotate_point u v theta (x, y) =
+  match x, y with 
+  | INF, _ | _, INF -> (x, y)
+  | N_INF, _ | _, N_INF -> (x, y)
+  | F x, F y ->
+    let x' = x -. u in
+    let y' = y -. v in
+    let cos_t = cos theta in
+    let sin_t = sin theta in
+    let x'' = x' *. cos_t -. y' *. sin_t in
+    let y'' = x' *. sin_t +. y' *. cos_t in
+    (F (x'' +. u), F (y'' +. v))
+
 type concrete_set =
   | ConcreteSet of mathematical_float * mathematical_float
   | BOTTOM
-    
+
+let rotate_rectangle s1 s2 u v theta =
+  match s1, s2 with
+  | BOTTOM, _ | _, BOTTOM -> (BOTTOM, BOTTOM)
+    (* In case one set is bottom, the rectangle is empty... *)
+  | ConcreteSet (a, b), ConcreteSet (c, d) ->
+    let corners = 
+      [(a, c); (a, d); (b, c); (b, d)] |> List.filter 
+        (fun (x, y) ->
+          match x, y with
+          | N_INF, _ | INF, _ | _, N_INF | _, INF -> true
+          | _ -> false)
+    in
+    let rotated_corners = List.map (rotate_point u v theta) corners in
+    let xs, ys = List.split rotated_corners in
+    let min_x =
+      if List.exists ((=) N_INF) [a; b] then
+        N_INF 
+      else 
+        List.fold_left min (List.hd xs) xs
+    in
+    let max_x =
+      if List.exists ((=) INF) [a; b] then
+        INF 
+      else 
+        List.fold_left max (List.hd xs) xs
+    in
+    let min_y =
+      if List.exists ((=) N_INF) [c; d] then
+        N_INF 
+      else 
+        List.fold_left min (List.hd ys) ys
+    in
+    let max_y = 
+      if List.exists ((=) INF) [c; d] then
+        INF 
+      else 
+        List.fold_left max (List.hd ys) ys 
+    in
+    (ConcreteSet (min_x, max_x), ConcreteSet (min_y, max_y))
 
 let subset_concrete (s1 : concrete_set)(s2 : concrete_set) : bool =
   match s1, s2 with
@@ -81,7 +133,6 @@ struct
     | (x11, x12), (x21, x22) ->
       (join_sets x11 x21, join_sets x12 x22)
 
-
   let widen (x1 : t)(x2 : t) : t =
     let widen_sets (s1 : concrete_set)(s2 : concrete_set) : concrete_set =
       match s1, s2 with
@@ -111,21 +162,19 @@ struct
       (ConcreteSet (x1 <+> u, x2 <+> u), ConcreteSet (y1 <+> v, y2 <+> v))
   
   let rotate ~(u : float)~(v : float)~(theta : float)(x : t) : t =
-    x
-
-
+    match x with
+    | s1, s2 ->
+      rotate_rectangle s1 s2 u v theta
 
   let subset (x1 : t)(x2 : t) : bool =
     match x1, x2 with
     | (x11, x12), (x21, x22) ->
       (subset_concrete x11 x21) && (subset_concrete x12 x22)
 
-
   let meet (x1 : t)(x2 : t) : t =
     match x1, x2 with
     | (x11, x12), (x21, x22) ->
       (intersection_concrete x11 x21, intersection_concrete x12 x22)
-
 
   let print (fmt : Format.formatter)(x : t) : unit =
     let print_mf fmt mf =

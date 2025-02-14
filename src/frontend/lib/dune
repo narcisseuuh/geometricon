@@ -5,5 +5,5 @@
 
 (menhir
  (modules parser))
-  
+
 (ocamllex lexer)
