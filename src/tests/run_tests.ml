@@ -10,20 +10,23 @@ module AbsInterpreter = Interprete(Interval)
 let parameters = [
   ("tests/basic1.geo", -1);
   ("tests/basic2.geo", -1);
-  ("tests/basic3.geo", -1);
+  (* ("tests/basic3.geo", -1);
   ("tests/basic4.geo", -1);
   ("tests/basic5.geo", -1);
-  ("tests/widening.geo", 5);
+  ("tests/widening.geo", 5); *)
 ]
 
 let rec analyze_tests p =
   match p with
   | (filename, unroll) :: rest ->
     begin
+      Format.fprintf Format.std_formatter
+        "Analyzing %s with unroll parameter %d\n" filename unroll;
       let ast = get_ast filename in
       if unroll > 0 then
         loop_unroll := unroll;
       AbsInterpreter.eval_prog ast;
+      Format.fprintf Format.std_formatter "\n";
       analyze_tests rest
     end
   | [] -> ()

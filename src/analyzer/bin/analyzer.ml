@@ -6,7 +6,10 @@ module AbsInterpreter = Interprete(Interval)
 
 exception ArgsError of string
 
+let file = ref ""
+
 let parse_set s =
+  begin
   try
     if String.contains s 'x' then
       let parts = String.split_on_char 'x' s in
@@ -23,12 +26,13 @@ let parse_set s =
         in
         let x_interval = parse_interval x_part in
         let y_interval = parse_interval y_part in
-        (AbstractSet x_interval, AbstractSet y_interval)
+        (AbstractSet (fst x_interval, snd x_interval), AbstractSet (fst y_interval, snd y_interval))
       | _ -> raise (ArgsError "Invalid target format")
     else
       raise (ArgsError "Invalid target format")
   with
   | Failure _ -> raise (ArgsError "Invalid number format")
+  end
 
 let help fmt =
   Format.fprintf fmt "usage : analyzer [ARGS]* file.geo\n\

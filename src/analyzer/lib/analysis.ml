@@ -24,7 +24,7 @@ struct
         Format.fprintf Format.std_formatter
         "@[<v 2>Result:@,@[<hov 2>State:@ %a@]@,\
         @[<hov 2>Intersects with target set:@ %a@]@,\
-        @[<hov 2>In statement:@ %a@]@]"
+        @[<hov 2>In statement:@ %a@]@]\n"
         D.print x D.print set_t print_stmt s;
         results := rest;
         show_results ()
@@ -52,6 +52,7 @@ struct
         else fixpoint f (D.join x fx)
       in
       let unrolled = unroll !loop_unroll s a in
+      let () = Format.fprintf Format.std_formatter "%a\n" D.print unrolled in
       fixpoint (fun x -> D.widen x (eval_stmt_list x s)) unrolled
     | Or (s1, s2) ->
       let analysis_lhs = eval_stmt_list a s1 in

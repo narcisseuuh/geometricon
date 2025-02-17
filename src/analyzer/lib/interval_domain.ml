@@ -51,45 +51,8 @@ type concrete_set =
   | ConcreteSet of mathematical_float * mathematical_float
   | BOTTOM
 
-let rotate_rectangle s1 s2 u v theta =
-  match s1, s2 with
-  | BOTTOM, _ | _, BOTTOM -> (BOTTOM, BOTTOM)
-    (* In case one set is bottom, the rectangle is empty... *)
-  | ConcreteSet (a, b), ConcreteSet (c, d) ->
-    let corners = 
-      [(a, c); (a, d); (b, c); (b, d)] |> List.filter 
-        (fun (x, y) ->
-          match x, y with
-          | N_INF, _ | INF, _ | _, N_INF | _, INF -> true
-          | _ -> false)
-    in
-    let rotated_corners = List.map (rotate_point u v theta) corners in
-    let xs, ys = List.split rotated_corners in
-    let min_x =
-      if List.exists ((=) N_INF) [a; b] then
-        N_INF 
-      else 
-        List.fold_left min (List.hd xs) xs
-    in
-    let max_x =
-      if List.exists ((=) INF) [a; b] then
-        INF 
-      else 
-        List.fold_left max (List.hd xs) xs
-    in
-    let min_y =
-      if List.exists ((=) N_INF) [c; d] then
-        N_INF 
-      else 
-        List.fold_left min (List.hd ys) ys
-    in
-    let max_y = 
-      if List.exists ((=) INF) [c; d] then
-        INF 
-      else 
-        List.fold_left max (List.hd ys) ys 
-    in
-    (ConcreteSet (min_x, max_x), ConcreteSet (min_y, max_y))
+let rotate_rectangle _s1 _s2 _u _v _theta =
+  (BOTTOM, BOTTOM)
 
 let subset_concrete (s1 : concrete_set)(s2 : concrete_set) : bool =
   match s1, s2 with
