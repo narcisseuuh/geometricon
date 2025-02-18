@@ -10,10 +10,10 @@ module AbsInterpreter = Interprete(Interval)
 let parameters = [
   ("tests/basic1.geo", -1);
   ("tests/basic2.geo", -1);
-  (* ("tests/basic3.geo", -1);
+  ("tests/basic3.geo", -1);
   ("tests/basic4.geo", -1);
   ("tests/basic5.geo", -1);
-  ("tests/widening.geo", 5); *)
+  ("tests/widening.geo", 5);
 ]
 
 let rec analyze_tests p =

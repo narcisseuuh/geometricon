@@ -1,38 +1,5 @@
 include Domain
-
-type mathematical_float =
-  | F of float
-  | INF
-  | N_INF
-
-let max m1 m2 =
-  match m1, m2 with
-  | INF, _ | _, INF -> INF
-  | N_INF, _ -> m2
-  | _, N_INF -> m1
-  | F x1, F x2 -> F (max x1 x2)
-
-let min m1 m2 =
-  match m1, m2 with
-  | N_INF, _ | _, N_INF -> N_INF
-  | INF, _ -> m2
-  | _, INF -> m1
-  | F x1, F x2 -> F (min x1 x2)
-
-let (<=) m1 m2 =
-  match m1, m2 with
-  | N_INF, _-> true
-  | _, N_INF -> false
-  | INF, _ -> false
-  | _, INF -> true
-  | F x1, F x2 -> x1 <= x2
-
-let (<+>) x y =
-  (* In practice, adding N_INF and INF cannot happen, so I don't care ^^ *)
-  match x with
-  | INF -> INF
-  | N_INF -> N_INF
-  | F xx -> F (xx +. y)
+include Extended_float
 
 let rotate_point u v theta (x, y) =
   match x, y with 
@@ -51,21 +18,30 @@ type concrete_set =
   | ConcreteSet of mathematical_float * mathematical_float
   | BOTTOM
 
-let rotate_rectangle _s1 _s2 _u _v _theta =
-  (BOTTOM, BOTTOM)
+let rotate_rectangle s1 s2 u v theta =
+  match s1, s2 with
+  | BOTTOM, _ | _, BOTTOM -> (BOTTOM, BOTTOM)
+  | ConcreteSet (x1, x2), ConcreteSet (y1, y2) ->
+    let (rotated_x1, rotated_x2) = rotate_point u v theta (x1, x2) in
+    let (rotated_y1, rotated_y2) = rotate_point u v theta (y1, y2) in
+    (ConcreteSet (Extended_float.min rotated_x1 rotated_x2, Extended_float.max rotated_x1 rotated_x2),
+    ConcreteSet (Extended_float.min rotated_y1 rotated_y2, Extended_float.max rotated_y1 rotated_y2))
 
 let subset_concrete (s1 : concrete_set)(s2 : concrete_set) : bool =
   match s1, s2 with
   | BOTTOM, _ -> true
   | _, BOTTOM -> false
   | ConcreteSet (x1, x2), ConcreteSet (y1, y2) ->
-    (x1 <= y1) && (x2 <= y2)
+    (Extended_float.compare x1 y1 <= 0) && (Extended_float.compare x2 y2 >= 0)
 
 let intersection_concrete (s1 : concrete_set)(s2 : concrete_set) : concrete_set =
   match s1, s2 with
   | BOTTOM, _ | _, BOTTOM -> BOTTOM
   | ConcreteSet (x1, x2), ConcreteSet (y1, y2) ->
-    ConcreteSet (max x1 y1, min x2 y2)
+    if max x1 y1 <= min x2 y2 then
+      ConcreteSet (max x1 y1, min x2 y2)
+    else
+      BOTTOM
 
 module Interval : Domain_t =
 struct
@@ -99,17 +75,20 @@ struct
   let widen (x1 : t)(x2 : t) : t =
     let widen_sets (s1 : concrete_set)(s2 : concrete_set) : concrete_set =
       match s1, s2 with
-      | BOTTOM, _ | _, BOTTOM -> BOTTOM
-      | ConcreteSet (x1, x2), ConcreteSet (y1, y2) ->
-        if x1 <= y1 then
-          begin
-            if x2 <= y2 then
-              ConcreteSet (x1, INF)
-            else
-              ConcreteSet (N_INF, x2)
-          end
-        else
-          ConcreteSet (N_INF, INF)
+      | BOTTOM, x | x, BOTTOM -> x
+      | ConcreteSet (a, b), ConcreteSet (a', b') ->
+        let lower =
+          if Extended_float.less_than a' a then
+            N_INF
+          else 
+            a
+        in
+        let upper =
+          if Extended_float.greater_than b' b then
+            INF
+          else
+            b
+        in ConcreteSet (lower, upper)
     in match x1, x2 with
     | (x11, x12), (y11, y12) ->
       (widen_sets x11 y11, widen_sets x12 y12)

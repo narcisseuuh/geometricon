@@ -44,7 +44,7 @@ struct
     | Iteration s ->
       let rec unroll (n : int)(s :stmt list)(x : t) : t =
         if n = 0 then x
-        else unroll (n - 1) s (eval_stmt_list x s)
+        else unroll (n - 1) s (D.join x (eval_stmt_list x s))
       in
       let rec fixpoint (f : t -> t)(x : t) =
         let fx = f x in
@@ -52,7 +52,6 @@ struct
         else fixpoint f (D.join x fx)
       in
       let unrolled = unroll !loop_unroll s a in
-      let () = Format.fprintf Format.std_formatter "%a\n" D.print unrolled in
       fixpoint (fun x -> D.widen x (eval_stmt_list x s)) unrolled
     | Or (s1, s2) ->
       let analysis_lhs = eval_stmt_list a s1 in
